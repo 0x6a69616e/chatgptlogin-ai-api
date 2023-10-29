@@ -4,13 +4,19 @@ const
 
 module.exports = class {
   static async new_chat(user_id) {
-    return await axios({
+    const {
+      data: {
+        id_
+      }
+    } = await axios({
       url: 'https://jarvischat.app/new_chat',
       method: 'POST',
       data: JSON.stringify({
         user_id
       })
-    })
+    });
+    
+    return id_;
   }
   
   static async chat_api_stream(question, chat_id) {
