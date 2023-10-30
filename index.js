@@ -1,6 +1,7 @@
 const
   axios = require('axios'),
-  { Transform } = require('stream');
+  { Transform } = require('stream'),  
+  baseURL = 'https://jarvischat.app';
 
 module.exports = class {
   static async new_chat(user_id) {
@@ -9,7 +10,7 @@ module.exports = class {
         id_
       }
     } = await axios({
-      url: 'https://jarvischat.app/new_chat',
+      url: baseURL + '/new_chat',
       method: 'POST',
       data: JSON.stringify({
         user_id
@@ -23,7 +24,7 @@ module.exports = class {
     const {
       data
     } = await axios({
-      url: 'https://jarvischat.app/chat_api_stream',
+      url: baseURL + '/chat_api_stream',
       method: 'POST',
       responseType: 'stream',
       data: JSON.stringify({
@@ -53,5 +54,28 @@ module.exports = class {
         callback(null, modifiedChunk);
       }
     }))
+  }
+
+  static async update_messages(chat_id, bot_response) {
+    const {
+      data: {
+        status,
+        content
+      }
+    } = await axios({
+      url: baseURL + '/update_messages',
+      method: 'POST',
+      data: JSON.stringify({
+        chat_id,
+        bot_response,
+        timestamp: Date.now()
+      })
+    });
+  
+    if (status !== 'ok') {
+      throw Error(content);
+    } else {
+      return status;
+    }
   }
 }
