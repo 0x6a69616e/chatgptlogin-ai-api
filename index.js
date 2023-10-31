@@ -78,4 +78,25 @@ module.exports = class {
       return status;
     }
   }
+
+  static async delete_chat(chat_id) {
+    const {
+      data: {
+        status,
+        content
+      }
+    } = await axios({
+      url: baseURL + '/delete_chat',
+      method: 'POST',
+      data: JSON.stringify({
+        chat_id
+      })
+    });
+
+    if (status !== 'ok') {
+      throw Error(content);
+    } else {
+      return status;
+    }
+  }
 }
