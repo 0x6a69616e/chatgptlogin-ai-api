@@ -19,7 +19,29 @@ module.exports = class {
     
     return id_;
   }
-  
+
+  static async update_chat_name(chat_id, chat_name) {
+    const {
+      data: {
+        status,
+        content
+      }
+    } = await axios({
+      url: baseURL + '/update_chat_name',
+      method: 'POST',
+      data: JSON.stringify({
+        chat_id,
+        chat_name
+      })
+    });
+
+    if (status !== 'ok') {
+      throw Error(content);
+    } else {
+      return status;
+    } 
+  }
+
   static async chat_api_stream(question, chat_id) {
     const {
       data
