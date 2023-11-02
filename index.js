@@ -1,7 +1,15 @@
 const
   axios = require('axios'),
-  { Transform } = require('stream'),  
+  { Transform } = require('stream'),
   baseURL = 'https://jarvischat.app';
+
+function checkStatus(status, content) {
+  if (status !== 'ok') {
+    throw Error(content);
+  } else {
+    return status;
+  }
+}
 
 module.exports = class {
   static async new_chat(user_id) {
@@ -16,7 +24,7 @@ module.exports = class {
         user_id
       })
     });
-    
+
     return id_;
   }
 
@@ -35,11 +43,7 @@ module.exports = class {
       })
     });
 
-    if (status !== 'ok') {
-      throw Error(content);
-    } else {
-      return status;
-    } 
+    return checkStatus(status, content);
   }
 
   static async chat_api_stream(question, chat_id) {
@@ -93,12 +97,8 @@ module.exports = class {
         timestamp: Date.now()
       })
     });
-  
-    if (status !== 'ok') {
-      throw Error(content);
-    } else {
-      return status;
-    }
+
+    return checkStatus(status, content);
   }
 
   static async delete_chat(chat_id) {
@@ -115,10 +115,6 @@ module.exports = class {
       })
     });
 
-    if (status !== 'ok') {
-      throw Error(content);
-    } else {
-      return status;
-    }
+    return checkStatus(status, content);
   }
 }
