@@ -15,7 +15,9 @@ function checkStatus(status, content) {
 }
 
 module.exports = class {
-  static async new_chat(user_id) {
+  static async new_chat(user_id = Array.from({
+    length: 17
+  }, () => Math.random().toString(36)[2]).join('')) {
     const {
       data: {
         id_
