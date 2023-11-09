@@ -62,7 +62,7 @@ module.exports = class {
 
     function modifyChunk(chunk) {
       const
-        line = new TextDecoder().decode(chunk).trimRight(),
+        line = chunk.toString().trimRight(),
         index = line.indexOf(':');
 
       if (index <= 0) return;
@@ -76,8 +76,7 @@ module.exports = class {
 
     return data.pipe(new Transform({
       transform(chunk, encoding, callback) {
-        let modifiedChunk = modifyChunk(chunk);
-        callback(null, modifiedChunk);
+        callback(null, modifyChunk(chunk));
       }
     }))
   }
