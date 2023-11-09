@@ -1,6 +1,9 @@
 const
   axios = require('axios'),
-  { Transform } = require('stream'),
+  {
+    Readable,
+    Transform
+  } = require('stream'),
   baseURL = 'https://jarvischat.app';
 
 function checkStatus(status, content) {
@@ -62,7 +65,7 @@ module.exports = class {
 
     function modifyChunk(chunk) {
       const
-        line = chunk.toString().trimRight(),
+        line = chunk.trimRight(),
         index = line.indexOf(':');
 
       if (index <= 0) return;
@@ -74,11 +77,26 @@ module.exports = class {
       return value;
     }
 
-    return data.pipe(new Transform({
-      transform(chunk, encoding, callback) {
-        callback(null, modifyChunk(chunk));
-      }
-    }))
+    const
+      transformed = data.pipe(new Transform({
+        transform(chunk, encoding, callback) {
+          callback(null, JSON.stringify(chunk.toString().split(/\n+|\r\n+|\r+/gm).filter(x => x)));
+        }
+      })),
+      readableStream = new Readable({
+        read(size) {
+          return !0;
+        }
+      });
+
+    transformed.on('data', chunk => {
+      const res = JSON.parse(new TextDecoder().decode(chunk));
+      res.map(x => readableStream.push(modifyChunk(x)));
+    });
+    
+    transformed.on('end', () => readableStream.push(null));
+
+    return readableStream;
   }
 
   static async update_messages(chat_id, bot_response) {
