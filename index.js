@@ -98,7 +98,22 @@ module.exports = class {
     
     transformed.on('end', () => readableStream.push(null));
 
-    return readableStream;
+    return {
+      handler: function (callback = () => !0) {
+        return new Promise((resolve, reject) => {
+          let response = [];
+          readableStream.on('data', chunk => {
+            const res = new TextDecoder().decode(chunk);
+            !callback || callback(res); 
+            response.push(res);
+          });
+          readableStream.on('end', () => resolve(response));
+          readableStream.on('error', reject);
+        });
+      },
+      parsed: readableStream,
+      raw: data
+    };
   }
 
   static async update_messages(chat_id, bot_response) {
