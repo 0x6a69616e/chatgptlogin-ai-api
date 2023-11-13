@@ -4,7 +4,9 @@ const
     Readable,
     Transform
   } = require('stream'),
-  baseURL = 'https://jarvischat.app';
+  
+  baseURL = 'https://jarvischat.app',
+  method = 'POST';
 
 function checkStatus(status, content) {
   if (status !== 'ok') {
@@ -24,7 +26,7 @@ module.exports = class {
       }
     } = await axios({
       url: baseURL + '/new_chat',
-      method: 'POST',
+      method,
       data: JSON.stringify({
         user_id
       })
@@ -41,7 +43,7 @@ module.exports = class {
       }
     } = await axios({
       url: baseURL + '/update_chat_name',
-      method: 'POST',
+      method,
       data: JSON.stringify({
         chat_id,
         chat_name
@@ -56,7 +58,7 @@ module.exports = class {
       data
     } = await axios({
       url: baseURL + '/chat_api_stream',
-      method: 'POST',
+      method,
       responseType: 'stream',
       data: JSON.stringify({
         question,
@@ -75,8 +77,7 @@ module.exports = class {
       const field = line.substring(0, index);
       if (field !== 'data') return;
 
-      const value = line.substring(index + 1).trimLeft();
-      return value;
+      return line.substring(index + 1).trimLeft();
     }
 
     const
@@ -99,11 +100,11 @@ module.exports = class {
     transformed.on('end', () => readableStream.push(null));
 
     return {
-      handler: function (callback = () => !0) {
+      handler(callback = x => x) {
         return new Promise((resolve, reject) => {
           let response = [];
           readableStream.on('data', chunk => {
-            const res = new TextDecoder().decode(chunk);
+            const res = chunk.toString();
             !callback || callback(res); 
             response.push(res);
           });
@@ -124,7 +125,7 @@ module.exports = class {
       }
     } = await axios({
       url: baseURL + '/update_messages',
-      method: 'POST',
+      method,
       data: JSON.stringify({
         chat_id,
         bot_response,
@@ -143,7 +144,7 @@ module.exports = class {
       }
     } = await axios({
       url: baseURL + '/delete_chat',
-      method: 'POST',
+      method,
       data: JSON.stringify({
         chat_id
       })
