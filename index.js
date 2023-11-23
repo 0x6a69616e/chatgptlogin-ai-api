@@ -3,10 +3,7 @@ const
   {
     Readable,
     Transform
-  } = require('stream'),
-  
-  baseURL = 'https://jarvischat.app',
-  method = 'POST';
+  } = require('stream');
 
 function checkStatus(status, content) {
   if (status !== 'ok') {
@@ -17,16 +14,22 @@ function checkStatus(status, content) {
 }
 
 module.exports = class {
-  static async new_chat(user_id = Array.from({
+  constructor(config = {}) {
+    this.axios = axios.create(Object.assign(config, {
+      baseURL: 'https://jarvischat.app',
+      method: 'POST'
+    }));
+  }
+
+  async new_chat(user_id = Array.from({
     length: 17
   }, () => Math.random().toString(36)[2]).join('')) {
     const {
       data: {
         id_
       }
-    } = await axios({
-      url: baseURL + '/new_chat',
-      method,
+    } = await this.axios({
+      url: '/new_chat',
       data: JSON.stringify({
         user_id
       })
@@ -35,15 +38,14 @@ module.exports = class {
     return id_;
   }
 
-  static async update_chat_name(chat_id, chat_name) {
+  async update_chat_name(chat_id, chat_name) {
     const {
       data: {
         status,
         content
       }
-    } = await axios({
-      url: baseURL + '/update_chat_name',
-      method,
+    } = await this.axios({
+      url: '/update_chat_name',
       data: JSON.stringify({
         chat_id,
         chat_name
@@ -53,12 +55,11 @@ module.exports = class {
     return checkStatus(status, content);
   }
 
-  static async chat_api_stream(question, chat_id) {
+  async chat_api_stream(question, chat_id) {
     const {
       data
-    } = await axios({
-      url: baseURL + '/chat_api_stream',
-      method,
+    } = await this.axios({
+      url: '/chat_api_stream',
       responseType: 'stream',
       data: JSON.stringify({
         question,
@@ -96,7 +97,7 @@ module.exports = class {
       const res = JSON.parse(new TextDecoder().decode(chunk));
       res.map(x => readableStream.push(modifyChunk(x)));
     });
-    
+
     transformed.on('end', () => readableStream.push(null));
 
     return {
@@ -105,7 +106,7 @@ module.exports = class {
           let response = [];
           readableStream.on('data', chunk => {
             const res = chunk.toString();
-            !callback || callback(res); 
+            !callback || callback(res);
             response.push(res);
           });
           readableStream.on('end', () => resolve(response));
@@ -117,15 +118,14 @@ module.exports = class {
     };
   }
 
-  static async update_messages(chat_id, bot_response) {
+  async update_messages(chat_id, bot_response) {
     const {
       data: {
         status,
         content
       }
-    } = await axios({
-      url: baseURL + '/update_messages',
-      method,
+    } = await this.axios({
+      url: '/update_messages',
       data: JSON.stringify({
         chat_id,
         bot_response,
@@ -136,15 +136,14 @@ module.exports = class {
     return checkStatus(status, content);
   }
 
-  static async delete_chat(chat_id) {
+  async delete_chat(chat_id) {
     const {
       data: {
         status,
         content
       }
-    } = await axios({
-      url: baseURL + '/delete_chat',
-      method,
+    } = await this.axios({
+      url: '/delete_chat',
       data: JSON.stringify({
         chat_id
       })
