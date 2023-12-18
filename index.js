@@ -3,7 +3,10 @@ const
   {
     Readable,
     Transform
-  } = require('stream');
+  } = require('stream'),
+
+  { now } = Date,
+  { stringify: strfy } = JSON;
 
 function checkStatus(status, content) {
   if (status !== 'ok') {
@@ -15,10 +18,9 @@ function checkStatus(status, content) {
 
 module.exports = class {
   constructor(config = {}) {
-    this.axios = axios.create(Object.assign(config, {
-      baseURL: 'https://jarvischat.app',
-      method: 'POST'
-    }));
+    this.post = axios.create(Object.assign(config, {
+      baseURL: 'https://jarvischat.app'
+    })).post;
   }
 
   async new_chat(user_id = Array.from({
@@ -28,12 +30,9 @@ module.exports = class {
       data: {
         id_
       }
-    } = await this.axios({
-      url: '/new_chat',
-      data: JSON.stringify({
-        user_id
-      })
-    });
+    } = await this.post('/new_chat', strfy({
+      user_id
+    }));
 
     return id_;
   }
@@ -44,13 +43,10 @@ module.exports = class {
         status,
         content
       }
-    } = await this.axios({
-      url: '/update_chat_name',
-      data: JSON.stringify({
-        chat_id,
-        chat_name
-      })
-    });
+    } = await this.post('/update_chat_name', strfy({
+      chat_id,
+      chat_name
+    }));
 
     return checkStatus(status, content);
   }
@@ -58,14 +54,12 @@ module.exports = class {
   async chat_api_stream(question, chat_id) {
     const {
       data
-    } = await this.axios({
-      url: '/chat_api_stream',
-      responseType: 'stream',
-      data: JSON.stringify({
-        question,
-        chat_id,
-        timestamp: Date.now()
-      })
+    } = await this.post('/chat_api_stream', strfy({
+      question,
+      chat_id,
+      timestamp: now()
+    }), {
+      responseType: 'stream'
     });
 
     function modifyChunk(chunk) {
@@ -84,7 +78,7 @@ module.exports = class {
     const
       transformed = data.pipe(new Transform({
         transform(chunk, encoding, callback) {
-          callback(null, JSON.stringify(chunk.toString().split(/\n+|\r\n+|\r+/gm).filter(x => x)));
+          callback(null, strfy(chunk.toString().split(/\n+|\r\n+|\r+/gm).filter(x => x)));
         }
       })),
       readableStream = new Readable({
@@ -124,14 +118,11 @@ module.exports = class {
         status,
         content
       }
-    } = await this.axios({
-      url: '/update_messages',
-      data: JSON.stringify({
-        chat_id,
-        bot_response,
-        timestamp: Date.now()
-      })
-    });
+    } = await this.post('/update_messages', strfy({
+      chat_id,
+      bot_response,
+      timestamp: now()
+    }));
 
     return checkStatus(status, content);
   }
@@ -142,12 +133,9 @@ module.exports = class {
         status,
         content
       }
-    } = await this.axios({
-      url: '/delete_chat',
-      data: JSON.stringify({
-        chat_id
-      })
-    });
+    } = await this.post('/delete_chat', strfy({
+      chat_id
+    }));
 
     return checkStatus(status, content);
   }
