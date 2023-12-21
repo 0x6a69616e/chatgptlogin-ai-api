@@ -18,9 +18,16 @@ function checkStatus(status, content) {
 
 module.exports = class {
   constructor(config = {}) {
-    this.post = axios.create(Object.assign(config, {
-      baseURL: 'https://jarvischat.app'
-    })).post;
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    
+    this.post = axios.create(this.config = Object.assign({
+      baseURL: 'https://jarvischat.app',
+      headers: {
+        'User-Agent': `Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.${randomInt(0, 9999)}.${randomInt(0, 99)} Safari/537.36`
+      }
+    }, config)).post;
   }
 
   async new_chat(user_id = Array.from({
