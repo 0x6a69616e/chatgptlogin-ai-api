@@ -28,11 +28,33 @@ module.exports = class {
         'User-Agent': `Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.${randomInt(0, 9999)}.${randomInt(0, 99)} Safari/537.36`
       }
     }, config)).post;
+
+    this.user_id = Array.from({
+      length: 17
+    }, () => Math.random().toString(36)[2]).join('');
   }
 
-  async new_chat(user_id = Array.from({
-    length: 17
-  }, () => Math.random().toString(36)[2]).join('')) {
+  async get_user_chat(user_id = this.user_id) {
+    const {
+      data
+    } = await this.post('/get_user_chat', strfy({
+      user_id
+    }));
+
+    return data.length ? data : undefined;
+  }
+
+  async get_chat(chat_id) {
+    const {
+      data
+    } = await this.post('/get_chat', strfy({
+      chat_id
+    }));
+
+    return data;
+  }
+
+  async new_chat(user_id = this.user_id) {
     const {
       data: {
         id_
