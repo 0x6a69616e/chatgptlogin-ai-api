@@ -1,7 +1,7 @@
 {
   "name": "@0x6a69616e/jarvischat-app",
   "version": "1.0.0",
-  "description": "A reverse-engineered API wrapper for Jarvis Chat App (jarvischat.app) and ChatGPTLogin (chatgptlogin.ai), which provide free access to OpenAI's GPT-3.",
+  "description": "A reverse-engineered API wrapper for Jarvis Chat App (jarvischat.app), which provides free access to OpenAI's GPT-3.",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
