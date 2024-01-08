@@ -158,14 +158,11 @@ module.exports = class {
 
   async delete_chat(chat_id) {
     const {
-      data: {
-        status,
-        content
-      }
+      data
     } = await this.post('/delete_chat', strfy({
       chat_id
     }));
 
-    return checkStatus(status, content);
+    return data === null;
   }
 }
