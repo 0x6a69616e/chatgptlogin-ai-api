@@ -1,2 +1,2 @@
 # jarvischat-app
-Reverse-engineered Node API wrapper for Jarvis Chat App (jarvischat.app)
+> A reverse-engineered Node API wrapper for ChatGPTLogin (chatgptlogin.ai), which provides free access to OpenAI's GPT-3.
