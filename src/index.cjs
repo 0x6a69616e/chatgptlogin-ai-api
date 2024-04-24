@@ -1,3 +1,5 @@
+'use strict';
+
 const axios = require('axios'),
   {
     Readable,
@@ -169,4 +171,4 @@ class Client {
   }
 }
 
-export { Client as default };
+module.exports = Client;
